@@ -1,0 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Amiri&display=swap');
+@import "tailwindcss";
+@import "tailwindcss";
+ 
+@plugin "tailwindcss-motion";
+:root {
+  font-family: 'Amiri', serif;
+  background-color: #E7EFFF;
+}
