@@ -1,10 +1,11 @@
 import React, { useState } from "react";
+import { handleLogin } from "../../services/loginHandler";
 
 const CompanyLogin = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-    remember: false,
+    remember: false,  // ✅ added to handle checkbox properly
   });
 
   const [errors, setErrors] = useState({});
@@ -23,14 +24,14 @@ const CompanyLogin = () => {
 
     switch (name) {
       case "email":
-        if (!value.trim()) errorMsg = "Company email is required";
+        if (!value?.trim()) errorMsg = "Company email is required";
         else if (
           !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)
         )
           errorMsg = "Please enter a valid email address";
         break;
       case "password":
-        if (!value.trim()) errorMsg = "Password is required";
+        if (!value?.trim()) errorMsg = "Password is required";
         break;
       default:
         break;
@@ -39,23 +40,36 @@ const CompanyLogin = () => {
     setErrors((prev) => ({ ...prev, [name]: errorMsg }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = {};
 
-    if (!formData.email.trim()) newErrors.email = "Company email is required";
+    if (!formData.email?.trim())
+      newErrors.email = "Company email is required";
     else if (
       !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(formData.email)
     )
       newErrors.email = "Please enter a valid email address";
 
-    if (!formData.password.trim()) newErrors.password = "Password is required";
+    if (!formData.password?.trim())
+      newErrors.password = "Password is required";
 
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
       console.log("Company Login Submitted:", formData);
-      // Submit login data to backend here
+      try {
+        await handleLogin(formData);
+      } catch (err) {
+        alert("Invalid email or password");
+        console.error(err);
+      }
+      // Reset form state to initial values
+      setFormData({
+        email: "",
+        password: "",
+        remember: false,
+      });
     }
   };
 
@@ -67,15 +81,22 @@ const CompanyLogin = () => {
           <div className="bg-purple-600 text-white rounded-full w-14 h-14 flex items-center justify-center text-lg font-bold">
             CP
           </div>
-          <h1 className="text-2xl font-semibold text-gray-800">Company Portal</h1>
-          <p className="text-gray-500">Access your business dashboard</p>
+          <h1 className="text-2xl font-semibold text-gray-800">
+            Company Portal
+          </h1>
+          <p className="text-gray-500">
+            Access your business dashboard
+          </p>
         </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit} noValidate>
           {/* Email */}
           <div className="mb-4">
-            <label htmlFor="email" className="block text-gray-700 mb-1">
+            <label
+              htmlFor="email"
+              className="block text-gray-700 mb-1"
+            >
               Company Email *
             </label>
             <input
@@ -93,13 +114,18 @@ const CompanyLogin = () => {
               }`}
             />
             {errors.email && (
-              <p className="text-xs text-red-600 mt-1">{errors.email}</p>
+              <p className="text-xs text-red-600 mt-1">
+                {errors.email}
+              </p>
             )}
           </div>
 
           {/* Password */}
           <div className="mb-4">
-            <label htmlFor="password" className="block text-gray-700 mb-1">
+            <label
+              htmlFor="password"
+              className="block text-gray-700 mb-1"
+            >
               Password *
             </label>
             <input
@@ -117,7 +143,9 @@ const CompanyLogin = () => {
               }`}
             />
             {errors.password && (
-              <p className="text-xs text-red-600 mt-1">{errors.password}</p>
+              <p className="text-xs text-red-600 mt-1">
+                {errors.password}
+              </p>
             )}
           </div>
 
@@ -136,7 +164,10 @@ const CompanyLogin = () => {
                 Keep me signed in
               </label>
             </div>
-            <a href="#" className="text-sm text-purple-600 hover:underline">
+            <a
+              href="#"
+              className="text-sm text-purple-600 hover:underline"
+            >
               Forgot password?
             </a>
           </div>
@@ -149,6 +180,16 @@ const CompanyLogin = () => {
             Sign In to Portal
           </button>
         </form>
+
+        <button
+          onClick={() => {
+            localStorage.clear();
+            alert("Log Out Successfully!");
+          }}
+          className="w-full bg-purple-600 text-white py-2 rounded-md hover:bg-purple-700 transition duration-200 mt-4"
+        >
+          Log Out
+        </button>
 
         {/* Links */}
         <p className="text-center text-sm text-gray-600 mt-4">

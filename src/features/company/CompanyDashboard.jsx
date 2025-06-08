@@ -1,6 +1,40 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { companyGetConsumer } from "../../CompanyService/companyGetConsumer";
+import { validateTokenAndRedirect } from "../../utils/tokenUtils";
+import { useNavigate } from "react-router-dom";
 
 const CompanyDashboard = () => {
+  const [table, setTable] = useState([{}]);
+  const navigate = useNavigate();
+  const handleGetData = async () => {
+  
+    // Handle the value here (e.g., send to backend)
+    try {
+      if (validateTokenAndRedirect()) {
+        const consumer = await companyGetConsumer();
+        setTable(consumer);
+      } else {
+        alert("Please login or Not Approve");
+        navigate("/company/login");
+      }
+      // Do something with banks (e.g., set in state)
+    } catch (error) {
+      console.error("Error fetching consummer:", error.message);
+      navigate("/company/login");
+      alert(error.message); // or show a toast notification
+    }
+  };
+  useEffect(() => {
+    handleGetData();
+  }, []);
+
+  if(!table){
+    return (
+        <div className="text-center text-gray-500 text-lg font-semibold mt-4">
+            You are not Approve
+          </div>
+    )
+  }
   return (
     <div className="p-6 bg-gray-50 max-h-screen ">
       {/* Header */}
@@ -39,50 +73,67 @@ const CompanyDashboard = () => {
           <thead className="border-b">
             <tr className="text-gray-500 text-sm">
               <th className="py-3 px-4">CONSUMER</th>
-              <th className="py-3 px-4">LOAN ID</th>
-              <th className="py-3 px-4">ACCESS LEVEL</th>
+              <th className="py-3 px-4">PHONE NO</th>
+              <th className="py-3 px-4">LOAN TYPE</th>
               <th className="py-3 px-4">STATUS</th>
-              <th className="py-3 px-4">LAST UPDATED</th>
+              <th className="py-3 px-4">LOAN AMOUNT</th>
             </tr>
           </thead>
           <tbody className="text-gray-700 text-sm">
             {/* Row 1 */}
-            <tr className="border-t">
-              <td className="py-4 px-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center font-medium text-gray-700">
-                    JD
-                  </div>
-                  <div>
-                    <p className="font-medium text-gray-800">John Doe</p>
-                    <p className="text-gray-500 text-sm">john.doe@email.com</p>
-                  </div>
-                </div>
-              </td>
-              <td className="py-4 px-4">LN-2024-001</td>
-              <td className="py-4 px-4">
-                <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
-                  Full Access
-                </span>
-              </td>
-              <td className="py-4 px-4">
-                <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
-                  Active
-                </span>
-              </td>
-              <td className="py-4 px-4">2024-01-15</td>
-            </tr>
 
-            {/* Additional rows can be added here */}
+            {table.map((data, index) => (
+              <tr className="border-t">
+                <td className="py-4 px-4">
+                  <div className="flex items-center gap-3">
+                    
+                    <div>
+                      <p className="font-medium text-gray-800">{data.firstName}{data.lastName}</p>
+                      <p className="text-gray-500 text-sm">
+                        {data.email}
+                      </p>
+                    </div>
+                  </div>
+                </td>
+                <td className="py-4 px-4">{data.phone}</td>
+                <td className="py-4 px-4">
+                  <span>
+                   {data.loanPurpose}
+                  </span>
+                </td>
+                <td className="py-4 px-4">
+                 {data.status == "ACTIVE" && (
+                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
+                      {data.status}
+                    </span>
+                  )}
+                  {data.status == "REJECTED" && (
+                    <span className="bg-red-400 text-green-800 px-2 py-1 rounded-full text-xs">
+                      {data.status}
+                    </span>
+                  )}
+                  {data.status == "PENDING" && (
+                    <span className="bg-amber-200 text-green-800 px-2 py-1 rounded-full text-xs">
+                      {data.status}
+                    </span>
+                  )}
+                  {data.status == "COMPLETE" && (
+                    <span className="bg-amber-200 text-green-800 px-2 py-1 rounded-full text-xs">
+                      {data.status}
+                    </span>
+                  )}
+                </td>
+                <td className="py-4 px-4">{data.loanAmount}</td>
+              </tr>
+            ))}
+
           </tbody>
         </table>
       </div>
 
       {/* Pagination */}
       <div className="flex justify-between items-center mt-4">
-        <p className="text-sm text-gray-600">
-          Showing 1 to 4 of 1,247 results
-        </p>
+        <p className="text-sm text-gray-600">Showing 1 to 4 of 1,247 results</p>
         <div className="flex items-center space-x-1">
           <button
             className="px-3 py-1 rounded border text-gray-400 cursor-not-allowed"

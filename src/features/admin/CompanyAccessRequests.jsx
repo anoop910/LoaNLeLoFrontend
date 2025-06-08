@@ -1,6 +1,72 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { adminGetCompany } from "../../services/adminGetCompany";
+import { useNavigate } from "react-router-dom";
+import { validateTokenAndRedirect } from "../../utils/tokenUtils";
+import LoanRejectPop from "./LoanRejectPop";
+import { adminRejectCompnay } from "../../services/adminRejectCompnay";
+import { AdminApproveCompany } from "../../services/AdminApproveCompany";
 
 const CompanyAccessRequests = () => {
+  const [table, setTable] = useState([{}]);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+
+  const handleOpen = () => setIsPopupOpen(true);
+  const handleClose = () => setIsPopupOpen(false);
+  const navigate = useNavigate();
+  const fetchCompany = async () => {
+    try {
+      if (validateTokenAndRedirect()) {
+        const company = await adminGetCompany();
+        setTable(company);
+
+        console.log("Fetch company", company);
+      } else {
+        alert("Please Login");
+        navigate("/admin/login");
+      }
+      // Do something with banks (e.g., set in state)
+    } catch (error) {
+      console.error("Error fetching company:", error.message);
+      navigate("/admin/login");
+      alert(error.message); // or show a toast notification
+    }
+  };
+  const handleSubmit = async (value) => {
+      console.log("Submitted value:", value);
+      // Handle the value here (e.g., send to backend)
+      try {
+        if (validateTokenAndRedirect()) {
+          await adminRejectCompnay(value);
+          alert("successfull !");
+  
+        } else {
+          navigate("/admin/login");
+        }
+        // Do something with banks (e.g., set in state)
+      } catch (error) {
+        console.error("Error fetching consummer:", error.message);
+        navigate("/admin/login");
+        alert(error.message); // or show a toast notification
+      }
+    };
+    const handleApproveComapany = async () => {
+        try {
+          if (validateTokenAndRedirect()) {
+            await AdminApproveCompany();
+            alert("successfull !");
+          } else {
+            navigate("/admin/login");
+          }
+          // Do something with banks (e.g., set in state)
+        } catch (error) {
+          console.error("Error fetching consummer:", error.message);
+          navigate("/admin/login");
+          alert(error.message); // or show a toast notification
+        }
+      };
+  useEffect(() => {
+    fetchCompany();
+  }, []);
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       {/* Header */}
@@ -41,80 +107,59 @@ const CompanyAccessRequests = () => {
             </tr>
           </thead>
           <tbody>
-            {/* Row 1 */}
-            <tr className="border-t">
-              <td className="py-4 px-4">
-                <div>
-                  <p className="font-medium text-gray-800">TechCorp Solutions</p>
-                  <p className="text-gray-500 text-sm">Financial Services</p>
-                </div>
-              </td>
-              <td className="py-4 px-4">contact@techcorp.com</td>
-              <td className="py-4 px-4">2024-01-15</td>
-              <td className="py-4 px-4">
-                <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">
-                  Pending
-                </span>
-              </td>
-              <td className="py-4 px-4 space-x-2">
-                <button className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">
-                  Approve
-                </button>
-                <button className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
-                  Reject
-                </button>
-              </td>
-            </tr>
-
-            {/* Row 2 */}
-            <tr className="border-t">
-              <td className="py-4 px-4">
-                <div>
-                  <p className="font-medium text-gray-800">DataFlow Analytics</p>
-                  <p className="text-gray-500 text-sm">Data Analytics</p>
-                </div>
-              </td>
-              <td className="py-4 px-4">admin@dataflow.com</td>
-              <td className="py-4 px-4">2024-01-14</td>
-              <td className="py-4 px-4">
-                <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
-                  Approved
-                </span>
-              </td>
-              <td className="py-4 px-4 space-x-2">
-                <button className="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600">
-                  View
-                </button>
-                <button className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
-                  Revoke
-                </button>
-              </td>
-            </tr>
-
-            {/* Row 3 */}
-            <tr className="border-t">
-              <td className="py-4 px-4">
-                <div>
-                  <p className="font-medium text-gray-800">FinSecure Inc</p>
-                  <p className="text-gray-500 text-sm">Security Services</p>
-                </div>
-              </td>
-              <td className="py-4 px-4">info@finsecure.com</td>
-              <td className="py-4 px-4">2024-01-13</td>
-              <td className="py-4 px-4">
-                <span className="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs">
-                  Rejected
-                </span>
-              </td>
-              <td className="py-4 px-4 space-x-2">
-                <button className="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600">
-                  View
-                </button>
-                <button className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
-                  Reconsider
-                </button>
-              </td>
-            </tr>
+            {table.map((data, index) => (
+              <tr key={index} className="border-t">
+                <td className="py-4 px-4">
+                  <div>
+                    <p className="font-medium text-gray-800">
+                      {data.companyName}
+                    </p>
+                    <p className="text-gray-500 text-sm">{data.businessType}</p>
+                  </div>
+                </td>
+                <td className="py-4 px-4">{data.businessEmail}</td>
+                <td className="py-4 px-4">{data.date}</td>
+                <td className="py-4 px-4">
+                 {data.status == "APPROVED" && (
+                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
+                      {data.status}
+                    </span>
+                  )}
+                  {data.status == "REJECTED" && (
+                    <span className="bg-red-400 text-green-800 px-2 py-1 rounded-full text-xs">
+                      {data.status}
+                    </span>
+                  )}
+                  {data.status == "PENDING" && (
+                    <span className="bg-amber-200 text-green-800 px-2 py-1 rounded-full text-xs">
+                      {data.status}
+                    </span>
+                  )}
+                 
+                </td>
+                <td className="py-4 px-4 space-x-2">
+                  <button onClick={()=>{
+                    const id = data.id;
+                    localStorage.setItem("AcomId", id);
+                    handleApproveComapany()
+                  }} className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">
+                    Approve
+                  </button>
+                  <button onClick={()=> {
+                    const id = data.id;
+                    localStorage.setItem("comId",id);
+                    handleOpen();
+                  }} className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+                    Reject
+                  </button>
+                  <LoanRejectPop
+                    isOpen={isPopupOpen}
+                    onClose={handleClose}
+                    onSubmit={handleSubmit}
+                  />
+                </td>
+              </tr>
+            ))}
 
             {/* Add more rows as needed */}
           </tbody>
@@ -123,9 +168,7 @@ const CompanyAccessRequests = () => {
 
       {/* Pagination */}
       <div className="flex justify-between items-center mt-4">
-        <p className="text-sm text-gray-600">
-          Showing 1 to 3 of 12 results
-        </p>
+        <p className="text-sm text-gray-600">Showing 1 to 3 of 12 results</p>
         <div className="flex items-center space-x-1">
           <button className="px-3 py-1 rounded border text-gray-500 hover:bg-gray-200">
             Previous

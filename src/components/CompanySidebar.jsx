@@ -28,13 +28,7 @@ const CompanySidebar = () => {
           <span className="text-lg">📊</span>
           <span className="text-sm">Company Dashboard</span>
         </Link>
-        <Link
-          to="/company/approved-loans"
-          className="flex items-center space-x-2 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100"
-        >
-          <span className="text-lg">⬇️</span>
-          <span className="text-sm">Approved Loan Data</span>
-        </Link>
+       
       </nav>
     </div>
   );

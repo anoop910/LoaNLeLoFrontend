@@ -5,34 +5,62 @@ import { adminGetConsumerDataForDashboard } from "../../services/adminGetConsume
 import { validateTokenAndRedirect } from "../../utils/tokenUtils";
 import { useNavigate } from "react-router-dom";
 import { adminRejectLoan } from "../../services/adminRejectLoan";
+import { adminApproveLoan } from "../../services/adminApproveLoan";
+import ViewLoanDetails from "./ViewLoanDetails";
+import { adminVeiwLoanData } from "../../services/adminVeiwLoanData";
 
 const ConsumerDataManagement = () => {
-  const navigate = useNavigate();
   
-const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const navigate = useNavigate();
 
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [isViewPopupOpen, setIsViewPopupOpen] = useState(false);
+  const [table, setTable] = useState([]);
+  const [viewData, setViewData] = useState({});
   const handleOpen = () => setIsPopupOpen(true);
   const handleClose = () => setIsPopupOpen(false);
-const [table, setTable] = useState([]);
+
+  const handleViewOpen = () => setIsViewPopupOpen(true);
+  const handlviewClose = () => setIsViewPopupOpen(false);
 
   const fetchConsumer = async () => {
-
     try {
-      if(validateTokenAndRedirect()){
-      const consumer = await adminGetConsumerDataForDashboard();
-      setTable(consumer);
+      if (validateTokenAndRedirect()) {
+        const consumer = await adminGetConsumerDataForDashboard();
+        setTable(consumer);
 
-      console.log("Fetch consumer", consumer);
-      }else{
-        navigate("/admin/login")
+        console.log("Fetch consumer", consumer);
+      } else {
+        alert("Please Login")
+        navigate("/admin/login");
       }
       // Do something with banks (e.g., set in state)
     } catch (error) {
       console.error("Error fetching consummer:", error.message);
-      navigate("/admin/login")
+      navigate("/admin/login");
       alert(error.message); // or show a toast notification
-    }
-  };
+    
+  }
+};
+const handleViewDataFetch = async (loanid) => {
+  try {
+      if (validateTokenAndRedirect()) {
+        const consumer = await adminVeiwLoanData(loanid);
+        setViewData(consumer);
+
+        console.log("Fetch consumer", consumer);
+      } else {
+        navigate("/admin/login");
+      }
+      // Do something with banks (e.g., set in state)
+    } catch (error) {
+      console.error("Error fetching consummer:", error.message);
+      navigate("/admin/login");
+      alert(error.message); // or show a toast notification
+    
+  }
+}
+
   useEffect(() => {
     fetchConsumer();
   }, []);
@@ -40,22 +68,36 @@ const [table, setTable] = useState([]);
     console.log("Submitted value:", value);
     // Handle the value here (e.g., send to backend)
     try {
-      if(validateTokenAndRedirect()){
-       await adminRejectLoan(value);
-      alert("successfull !")
+      if (validateTokenAndRedirect()) {
+        await adminRejectLoan(value);
+        alert("successfull !");
 
-      console.log("Fetch consumer", );
-      }else{
-        navigate("/admin/login")
+        console.log("Fetch consumer");
+      } else {
+        navigate("/admin/login");
       }
       // Do something with banks (e.g., set in state)
     } catch (error) {
       console.error("Error fetching consummer:", error.message);
-      navigate("/admin/login")
+      navigate("/admin/login");
       alert(error.message); // or show a toast notification
     }
   };
-
+  const handleApproveLoan = async () => {
+    try {
+      if (validateTokenAndRedirect()) {
+        await adminApproveLoan();
+        alert("successfull !");
+      } else {
+        navigate("/admin/login");
+      }
+      // Do something with banks (e.g., set in state)
+    } catch (error) {
+      console.error("Error fetching consummer:", error.message);
+      navigate("/admin/login");
+      alert(error.message); // or show a toast notification
+    }
+  };
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
@@ -104,47 +146,87 @@ const [table, setTable] = useState([]);
             </tr>
           </thead>
           <tbody>
-
-          {
-            table.map((cdata, index)=> (
+            {table.map((cdata, index) => (
               <tr key={index} className="border-t">
-              <td className="py-4 px-4">
-                <div>
-                  <p className="font-medium text-gray-800">{cdata.firstName}{cdata.lastName}</p>
-                  <p className="text-gray-500 text-sm">{cdata.email}</p>
-                </div>
-              </td>
-              <td className="py-4 px-4">{cdata.id}</td>
-              <td className="py-4 px-4">{cdata.loanAmount}</td>
-              <td className="py-4 px-4">
-                <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
-                  Active
-                </span>
-              </td>
-              <td className="py-4 px-4">{cdata.startDate}</td>
-              <td className="py-4 px-4 space-x-2">
-                <button className="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600">
-                  View
-                </button>
-                <button className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
-                  Approve
-                </button>
-                <button onClick={()=>{
-                  const id = cdata.id;
-                  localStorage.setItem("loanId",id);
-                  handleOpen()
-                }} className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
-                  Reject 
-                </button>
-                <LoanRejectPop isOpen={isPopupOpen}
-                              onClose={handleClose}
-                              onSubmit={handleSubmit}/>
-              </td>
-            </tr>
-            ))
-          }
+                <td className="py-4 px-4">
+                  <div>
+                    <p className="font-medium text-gray-800">
+                      {cdata.firstName}
+                      {cdata.lastName}
+                    </p>
+                    <p className="text-gray-500 text-sm">{cdata.email}</p>
+                  </div>
+                </td>
+                <td className="py-4 px-4">{cdata.id}</td>
+                <td className="py-4 px-4">{cdata.loanAmount}</td>
+                <td className="py-4 px-4">
+                  {cdata.status == "ACTIVE" && (
+                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
+                      {cdata.status}
+                    </span>
+                  )}
+                  {cdata.status == "REJECTED" && (
+                    <span className="bg-red-400 text-green-800 px-2 py-1 rounded-full text-xs">
+                      {cdata.status}
+                    </span>
+                  )}
+                  {cdata.status == "PENDING" && (
+                    <span className="bg-amber-200 text-green-800 px-2 py-1 rounded-full text-xs">
+                      {cdata.status}
+                    </span>
+                  )}
+                  {cdata.status == "COMPLETE" && (
+                    <span className="bg-emerald-200 text-green-800 px-2 py-1 rounded-full text-xs">
+                      {cdata.status}
+                    </span>
+                  )}
+                </td>
+                <td className="py-4 px-4">{cdata.startDate}</td>
+                <td className="py-4 px-4 space-x-2">
+                  <button
+                    onClick={() => {
+                      const loanid = cdata.id;
+                      handleViewDataFetch(loanid);
+                      handleViewOpen();
+                    }}
+                    className="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600"
+                  >
+                    View
+                  </button>
+                  <ViewLoanDetails
+                    isOpen={isViewPopupOpen}
+                    onClose={handlviewClose}
+                    data={viewData}
+                  />
+                  <button
+                    onClick={() => {
+                      const id = cdata.id;
+                      localStorage.setItem("ALoanId", id);
+                      handleApproveLoan();
+                    }}
+                    className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                  >
+                    Approve
+                  </button>
+                  <button
+                    onClick={() => {
+                      const id = cdata.id;
+                      localStorage.setItem("loanId", id);
+                      handleOpen();
+                    }}
+                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                  >
+                    Reject
+                  </button>
+                  <LoanRejectPop
+                    isOpen={isPopupOpen}
+                    onClose={handleClose}
+                    onSubmit={handleSubmit}
+                  />
+                </td>
+              </tr>
+            ))}
 
-         
             {/* More rows as needed */}
           </tbody>
         </table>

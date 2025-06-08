@@ -12,7 +12,7 @@ const LoanRejectPop = ({ isOpen, onClose, onSubmit }) => {
   };
 
   return (
-    <div  className="fixed inset-0 flex items-center justify-center bg-white/65 bg-opacity-50 z-50">
+    <div  className="fixed inset-0 flex items-center justify-center  bg-amber-50/50 bg-opacity-50 z-50">
       <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-md">
         <h2 className="text-xl font-semibold mb-4">Enter Value</h2>
         <input
