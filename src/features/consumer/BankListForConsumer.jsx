@@ -27,7 +27,7 @@ const [banks, setBanks] = useState([]);
       <div className="flex flex-wrap justify-center">
         {banks.length === 0 && (
           <div className="text-center text-gray-500 text-lg font-semibold mt-4">
-            You Have no any Bank
+            No Any Bank Available 
           </div>
         ) }
         {banks.map((bank, index) => (

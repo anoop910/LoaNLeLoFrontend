@@ -9,8 +9,6 @@ const PersonalInformationStep = ({
 }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    // This allows the initial fill-in, but disables further edits via the readOnly attribute
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -31,11 +29,11 @@ const PersonalInformationStep = ({
       ].includes(name)
     ) {
       if (!value.trim()) error = "This field is required.";
-    } else if (name === "emailAddress") {
+    } else if (name === "email") {
       if (!value.trim()) error = "Email is required.";
       else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value))
         error = "Invalid email address.";
-    } else if (name === "phoneNumber") {
+    } else if (name === "phone") {
       if (!value.trim()) error = "Phone number is required.";
       else if (!/^\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$/.test(value))
         error = "Invalid phone number.";
@@ -112,7 +110,6 @@ const PersonalInformationStep = ({
                 value={formData.firstName}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                readOnly={formData.firstName?.trim() !== ""}
                 className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 ${
                   errors.firstName
                     ? "border-red-500 focus:ring-red-500"
@@ -123,6 +120,7 @@ const PersonalInformationStep = ({
                 <p className="text-xs text-red-600 mt-1">{errors.firstName}</p>
               )}
             </div>
+
             {/* Last Name */}
             <div>
               <label className="block text-sm font-medium mb-1">
@@ -134,7 +132,6 @@ const PersonalInformationStep = ({
                 value={formData.lastName}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                readOnly={formData.lastName?.trim() !== ""}
                 className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 ${
                   errors.lastName
                     ? "border-red-500 focus:ring-red-500"
@@ -145,6 +142,7 @@ const PersonalInformationStep = ({
                 <p className="text-xs text-red-600 mt-1">{errors.lastName}</p>
               )}
             </div>
+
             {/* Email */}
             <div>
               <label className="block text-sm font-medium mb-1">
@@ -152,11 +150,10 @@ const PersonalInformationStep = ({
               </label>
               <input
                 type="email"
-                name="emailAddress"
+                name="email"
                 value={formData.email}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                readOnly={formData.email?.trim() !== ""}
                 className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 ${
                   errors.email
                     ? "border-red-500 focus:ring-red-500"
@@ -167,6 +164,7 @@ const PersonalInformationStep = ({
                 <p className="text-xs text-red-600 mt-1">{errors.email}</p>
               )}
             </div>
+
             {/* Phone Number */}
             <div>
               <label className="block text-sm font-medium mb-1">
@@ -174,11 +172,10 @@ const PersonalInformationStep = ({
               </label>
               <input
                 type="tel"
-                name="phoneNumber"
+                name="phone"
                 value={formData.phone}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                readOnly={formData.phone?.trim() !== ""}
                 className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 ${
                   errors.phone
                     ? "border-red-500 focus:ring-red-500"
@@ -189,6 +186,7 @@ const PersonalInformationStep = ({
                 <p className="text-xs text-red-600 mt-1">{errors.phone}</p>
               )}
             </div>
+
             {/* Aadhar Card Number */}
             <div>
               <label className="block text-sm font-medium mb-1">
@@ -200,7 +198,6 @@ const PersonalInformationStep = ({
                 value={formData.aadharCardNumber}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                readOnly={formData.aadharCardNumber?.trim() !== ""}
                 className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 ${
                   errors.aadharCardNumber
                     ? "border-red-500 focus:ring-red-500"
@@ -213,6 +210,7 @@ const PersonalInformationStep = ({
                 </p>
               )}
             </div>
+
             {/* Date of Birth */}
             <div>
               <label className="block text-sm font-medium mb-1">
@@ -224,7 +222,6 @@ const PersonalInformationStep = ({
                 value={formData.dateOfBirth}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                readOnly={formData.dateOfBirth?.trim() !== ""}
                 className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 ${
                   errors.dateOfBirth
                     ? "border-red-500 focus:ring-red-500"
@@ -237,6 +234,7 @@ const PersonalInformationStep = ({
                 </p>
               )}
             </div>
+
             {/* Home Address */}
             <div className="md:col-span-2">
               <label className="block text-sm font-medium mb-1">
@@ -248,7 +246,6 @@ const PersonalInformationStep = ({
                 value={formData.homeAddress}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                readOnly={formData.homeAddress?.trim() !== ""}
                 className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 ${
                   errors.homeAddress
                     ? "border-red-500 focus:ring-red-500"
@@ -261,6 +258,7 @@ const PersonalInformationStep = ({
                 </p>
               )}
             </div>
+
             {/* City */}
             <div>
               <label className="block text-sm font-medium mb-1">
@@ -272,7 +270,6 @@ const PersonalInformationStep = ({
                 value={formData.city}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                readOnly={formData.city?.trim() !== ""}
                 className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 ${
                   errors.city
                     ? "border-red-500 focus:ring-red-500"
@@ -283,6 +280,7 @@ const PersonalInformationStep = ({
                 <p className="text-xs text-red-600 mt-1">{errors.city}</p>
               )}
             </div>
+
             {/* State */}
             <div>
               <label className="block text-sm font-medium mb-1">
@@ -293,15 +291,12 @@ const PersonalInformationStep = ({
                 value={formData.state}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                disabled={formData.state?.trim() !== ""}
                 className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 ${
                   errors.state
                     ? "border-red-500 focus:ring-red-500"
                     : "focus:ring-blue-500"
                 }`}
               >
-                <option value="">Select State</option>
-                {/* Add other states as needed */}
                 <option value="">Select State</option>
                 <option value="Andhra Pradesh">Andhra Pradesh</option>
                 <option value="Arunachal Pradesh">Arunachal Pradesh</option>
@@ -343,12 +338,12 @@ const PersonalInformationStep = ({
                 <option value="Ladakh">Ladakh</option>
                 <option value="Lakshadweep">Lakshadweep</option>
                 <option value="Puducherry">Puducherry</option>
-                {/* ... */}
               </select>
               {errors.state && (
                 <p className="text-xs text-red-600 mt-1">{errors.state}</p>
               )}
             </div>
+
             {/* ZIP Code */}
             <div className="md:col-span-2">
               <label className="block text-sm font-medium mb-1">
@@ -360,7 +355,6 @@ const PersonalInformationStep = ({
                 value={formData.zipCode}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                readOnly={formData.zipCode?.trim() !== ""}
                 className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 ${
                   errors.zipCode
                     ? "border-red-500 focus:ring-red-500"
